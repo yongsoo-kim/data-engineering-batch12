@@ -204,13 +204,13 @@ AIRFLOW_HOME=/var/lib/airflow airflow users delete --username admin
 
 ## 이 Github repo를 클론해서 dags 폴더에 있는 DAG들을 /var/lib/airflow/dags로 복사
 
-keeyong/data-engineering-batch11 repository에 있는 dags 폴더의 내용을 /var/lib/airflow/dags로 복사한다. 
+keeyong/data-engineering-batch12 repository에 있는 dags 폴더의 내용을 /var/lib/airflow/dags로 복사한다. 
 
 ```
 sudo su airflow
 cd ~/
-git clone https://github.com/keeyong/data-engineering-batch11.git
-cp -r data-engineering-batch11/dags/* dags
+git clone https://github.com/keeyong/data-engineering-batch12.git
+cp -r data-engineering-batch12/dags/* dags
 ```
 
 ## 이 Github repo의 업데이트가 필요한 경우
