@@ -53,9 +53,9 @@ def etl():
 
 
 dag_second_assignment = DAG(
-	dag_id = 'second_assignment',
+	dag_id = 'name_gender',
 	catchup = False,
-	start_date = datetime(2022,10,6), # 날짜가 미래인 경우 실행이 안됨
+	start_date = datetime(2023,4,6), # 날짜가 미래인 경우 실행이 안됨
 	schedule_interval = '0 2 * * *')  # 적당히 조절
 
 task = PythonOperator(
