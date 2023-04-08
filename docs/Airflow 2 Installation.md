@@ -94,9 +94,6 @@ airflow.cfg  airflow.db  dags   logs  unittests.cfg
  * DB 연결스트링("sql_alchemy_conn")을 앞서 설치한 Postgres로 바꾼다
    * 이 경우 ID와 PW와 데이터베이스 이름이 모두 airflow를 사용하고 호스트 이름은 localhost를 사용한다
  * "load_examples" 설정을 False로 바꾼다
- * timezone을 서울시간으로 바꾼다
-   * default_ui_timezone 값을 Asia/Seoul로 수정 (Web UI의 시간대)
-   * default_timezone 값을 Asia/Seoul로 수정 (스케줄러의 시간대)
  
 ```
 [core]
@@ -106,10 +103,6 @@ executor = LocalExecutor
 sql_alchemy_conn = postgresql+psycopg2://airflow:airflow@localhost:5432/airflow
 ...
 load_examples = False
-...
-default_ui_timezone = Asia/Seoul
-...
-default_timezone = Asia/Seoul
 ```
 
 #### Airflow를 재설정
