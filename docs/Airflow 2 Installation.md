@@ -217,10 +217,10 @@ cp -r data-engineering-batch12/dags/* dags
 
 ```
 sudo su airflow
-cd ~/data-engineering-batch11
+cd ~/data-engineering-batch12
 git pull
 cd ..
-cp -r data-engineering-batch11/dags/* dags
+cp -r data-engineering-batch12/dags/* dags
 ```
 
 그리고나서 Airflow 웹서버를 다시 방문해보면 (이 설치 작업을 한 시점에 따라) DAG들이 몇개 보이고 일부 에러도 몇개 보일 수 있다. 이 에러들은 나중에 하나씩 해결한다.
