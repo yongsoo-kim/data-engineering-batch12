@@ -29,19 +29,19 @@ def extract(**context):
 
 
 def transform(**context):
-    f = context["task_instance"].xcom_pull(key="return_value", task_ids="extract")
+    json_response = context["task_instance"].xcom_pull(key="return_value", task_ids="extract")
 
     weather_forecast_info = list()
-    for d in f.json()["daily"]:
+    for d in json_response["daily"]:
+        date = datetime.fromtimestamp(d["dt"]).strftime('%Y-%m-%d')
         info = {
-            "date": datetime.fromtimestamp(d["dt"]),
+            "date": date,
             "temp": d["temp"]["day"],
             "min_temp": d["temp"]["min"],
             "max_temp": d["temp"]["max"]
         }
         weather_forecast_info.append(info)
 
-    print(weather_forecast_info)
     return weather_forecast_info
 
 
@@ -49,22 +49,21 @@ def load(**context):
     schema = context["params"]["schema"]
     table = context["params"]["table"]
 
-    #cur = get_Redshift_connection()
-    weather_forecast_info   = context["task_instance"].xcom_pull(key="return_value", task_ids="transform")
+    cur = get_Redshift_connection()
+    weather_forecast_info = context["task_instance"].xcom_pull(key="return_value", task_ids="transform")
     print(weather_forecast_info)
-    # sql = "BEGIN; DELETE FROM {schema}.{table};".format(schema=schema, table=table)
-    # for line in lines:
-    #     if line != "":
-    #         (name, gender) = line.split(",")
-    #         print(name, "-", gender)
-    #         sql += f"""INSERT INTO {schema}.{table} VALUES ('{name}', '{gender}');"""
-    # sql += "END;"
-    # logging.info(sql)
-    # cur.execute(sql)
+    sql = "BEGIN; DELETE FROM {schema}.{table};".format(schema=schema, table=table)
+
+    for info in weather_forecast_info:
+        date, temp, min_temp, max_temp = info["date"], info["temp"], info["min_temp"], info["max_temp"]
+        sql += f"""INSERT INTO {schema}.{table} (date,temp,min_temp,max_temp) VALUES ('{date}','{temp}', '{min_temp}','{max_temp}');"""
+    sql += "END;"
+    logging.info(sql)
+    cur.execute(sql)
 
 
-dag_second_assignment = DAG(
-    dag_id='name_gender_v4',
+dag_fourth_assignment = DAG(
+    dag_id='dag_fourth_assignment',
     start_date=datetime(2023, 4, 6),  # 날짜가 미래인 경우 실행이 안됨
     schedule='0 2 * * *',  # 적당히 조절
     max_active_runs=1,
