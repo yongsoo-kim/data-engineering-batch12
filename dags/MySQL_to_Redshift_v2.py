@@ -13,9 +13,9 @@ import psycopg2
 import json
 
 dag = DAG(
-    dag_id = 'MySQL_to_Redshift_v3',
-    start_date = datetime(2022,8,24), # 날짜가 미래인 경우 실행이 안됨
-    schedule_interval = '0 9 * * *',  # 적당히 조절
+    dag_id = 'MySQL_to_Redshift_v2',
+    start_date = datetime(2023,4,20), # 날짜가 미래인 경우 실행이 안됨
+    schedule = '0 9 * * *',  # 적당히 조절
     max_active_runs = 1,
     catchup = True,
     default_args = {
@@ -49,7 +49,7 @@ s3_to_redshift_nps = S3ToRedshiftOperator(
     s3_key = s3_key,
     schema = schema,
     table = table,
-    copy_options=['csv', "IGNOREHEADER 1"],
+    copy_options=['csv'],
     redshift_conn_id = "redshift_dev_db",
     method = "UPSERT",
     upsert_keys = ["id", "created_at"],
