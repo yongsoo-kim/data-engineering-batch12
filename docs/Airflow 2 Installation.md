@@ -26,6 +26,7 @@ sudo pip3 install --ignore-installed "apache-airflow[celery,amazon,mysql,postgre
 sudo pip3 install oauth2client
 sudo pip3 install gspread
 sudo pip3 install numpy
+sudo pip3 install pandas
 # sudo pip3 install cryptography psycopg2-binary
 ```
 
