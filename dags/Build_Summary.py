@@ -53,7 +53,7 @@ def execSQL(**context):
 dag = DAG(
     dag_id = "Build_Summary",
     start_date = datetime(2021,12,10),
-    schedule_interval = '@once',
+    schedule = '@once',
     catchup = False
 )
 
@@ -70,6 +70,5 @@ execsql = PythonOperator(
         FROM raw_data.user_session_channel A
         LEFT JOIN raw_data.session_timestamp B ON A.sessionid = B.sessionid;"""
     },
-    provide_context = True,
     dag = dag
 )
