@@ -5,7 +5,7 @@ Follow these steps to install the necessary tools.
 
 1. Install [Docker Community Edition (CE)](https://docs.docker.com/engine/installation/) on your workstation. Depending on the OS, you may need to configure your Docker instance to use 4.00 GB of memory for all containers to run properly. Please refer to the Resources section if using [Docker for Windows](https://docs.docker.com/docker-for-windows/#resources>) or [Docker for Mac](https://docs.docker.com/docker-for-mac/#resources) for more information.
 2. Check if you have `docker-compose` installed buy running `docker-compose --version`
-3. If not installed, install [Docker Compose](https://docs.docker.com/compose/install/) v1.29.1 and newer on your workstation (I'm using `v2.0.0`)
+3. If not installed, install [Docker Compose](https://docs.docker.com/compose/install/) v1.29.1 and newer on your workstation (I'm using `v2.15.1`)
 
 Older versions of ``docker-compose`` do not support all the features required by ``docker-compose.yaml`` file, so double check that your version meets the minimum version requirements.
 
