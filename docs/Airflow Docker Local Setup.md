@@ -26,7 +26,7 @@ Though the image itself has command to download `pipenv` to be used in the conta
 For more information on `pipenv`, please refer to this [page](https://pipenv-fork.readthedocs.io/en/latest/basics.html).
 
 ### Spinning Up Local Airflow Services
-1. data-engineering-batch12 리포를 다운로드받고 메인폴더로 이동한다.
+1. data-engineering-batch12 리포를 다운로드받고 메인폴더로 이동한다. 여기 있는 dags 폴더가 결국 airflow dags 폴더가 되고 여기 있는 파이썬 파일들이 DAG로 인식된다.
 ```
 git clone https://github.com/keeyong/data-engineering-batch12.git
 cd data-engineering-batch12
@@ -57,6 +57,23 @@ e2abda41736f   postgres:13            "docker-entrypoint.s…"   53 minutes ago 
     * password: `airflow`
 7. 로그인하면 아래와 같은 페이지가 보여야 한다
 ![Local Airflow Login Page](./images/airflow_dags.png)
+
+### Airflow 컨테이너로 로그인하는 방법
+1. `docker ps`를 실행하고 data-engineering-batch12-airflow-scheduler-1의 CONTAINER ID를 추출한다. 아래 예라면 b9c06238f108에 해당한다. 
+```
+CONTAINER ID   IMAGE                  COMMAND                  CREATED          STATUS                   PORTS                    NAMES
+416c95ae400e   apache/airflow:2.5.1   "/usr/bin/dumb-init …"   11 minutes ago   Up 3 minutes (healthy)   8080/tcp                 data-engineering-batch12-airflow-worker-1
+b9c06238f108   apache/airflow:2.5.1   "/usr/bin/dumb-init …"   11 minutes ago   Up 3 minutes (healthy)   8080/tcp                 data-engineering-batch12-airflow-scheduler-1
+...
+```
+2. Container ID("b9c06238f108")를 바탕으로 `docker exec -it b9c06238f108 sh`를 실행한다. 그러면 셀 모드로 들어갈 수 있고 거기서 airflow 명령어를 실행할 수 있다. 소스 코드 편집은 앞서 코드리포를 다운로드 받은 폴더(data-engineering-batch12) 밑의 dags 폴더를 사용하면 된다.
+```
+% docker exec -it b9c06238f108 sh
+(airflow)airflow tasks list HelloWorld
+/home/airflow/.local/lib/python3.7/site-packages/airflow/models/base.py:49 MovedIn20Warning: [31mDeprecated API features detected! These feature(s) are not compatible with SQLAlchemy 2.0. [32mTo prevent incompatible upgrades prior to updating applications, ensure requirements files are pinned to "sqlalchemy<2.0". [36mSet environment variable SQLALCHEMY_WARN_20=1 to show all deprecation warnings.  Set environment variable SQLALCHEMY_SILENCE_UBER_WARNING=1 to silence this message.[0m (Background on SQLAlchemy 2.0 at: https://sqlalche.me/e/b8d9)
+print_goodbye
+print_hello
+```
 
 ### Shutting Down Local Airflow Services
 1. `ctrl+c`
