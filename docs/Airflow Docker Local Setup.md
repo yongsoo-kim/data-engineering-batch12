@@ -38,6 +38,17 @@ curl -LfO 'https://airflow.apache.org/docs/apache-airflow/2.5.1/docker-compose.y
 3. `docker compose up airflow-init`를 실행한다. 이 때 Redis와 Postgres가 실행되고 Airflow 설치가 완료된다.
 ![docker compose init 결과 화면](./images/docker_compose_init.png)
 4. Airflow를 실행하기 위해 `docker compose up` 명령을 실행한다.
+5. `docker ps` 명령을 실행해서 모든 프로세스가 동작하는지 확인한다.
+```
+CONTAINER ID   IMAGE                  COMMAND                  CREATED          STATUS                   PORTS                    NAMES
+416c95ae400e   apache/airflow:2.5.1   "/usr/bin/dumb-init …"   11 minutes ago   Up 3 minutes (healthy)   8080/tcp                 data-engineering-batch12-airflow-worker-1
+b9c06238f108   apache/airflow:2.5.1   "/usr/bin/dumb-init …"   11 minutes ago   Up 3 minutes (healthy)   8080/tcp                 data-engineering-batch12-airflow-scheduler-1
+d936e07d706f   apache/airflow:2.5.1   "/usr/bin/dumb-init …"   11 minutes ago   Up 3 minutes (healthy)   8080/tcp                 data-engineering-batch12-airflow-triggerer-1
+34f28c6a0935   apache/airflow:2.5.1   "/usr/bin/dumb-init …"   11 minutes ago   Up 3 minutes (healthy)   0.0.0.0:8080->8080/tcp   data-engineering-batch12-airflow-webserver-1
+e2abda41736f   postgres:13            "docker-entrypoint.s…"   53 minutes ago   Up 3 minutes (healthy)   5432/tcp                 data-engineering-batch12-postgres-1
+67c5ffb14bec   redis:latest           "docker-entrypoint.s…"   53 minutes ago   Up 3 minutes (healthy)   6379/tcp                 data-engineering-batch12-redis-1
+```
+도커 프로그램에서 위의 프로세스들이 실행되고 있는지 다시 한번 확인한다
 ![docker compose up 결과 화면](./images/docker_compose_up.png)
 5. 브라우저를 열고 `http://localhost:8080/`로 접근한다. 다음과 같은 로그인 페이지가 보여야 한다:
 ![Local Airflow Login Page](./images/airflow_login.png)
@@ -45,7 +56,7 @@ curl -LfO 'https://airflow.apache.org/docs/apache-airflow/2.5.1/docker-compose.y
     * username: `airflow`
     * password: `airflow`
 7. 로그인하면 아래와 같은 페이지가 보여야 한다
-![Local Airflow Login Page](./images/airflow_login.png)
+![Local Airflow Login Page](./images/airflow_dags.png)
 
 ### Shutting Down Local Airflow Services
 1. `ctrl+c`
