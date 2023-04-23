@@ -26,51 +26,32 @@ Though the image itself has command to download `pipenv` to be used in the conta
 For more information on `pipenv`, please refer to this [page](https://pipenv-fork.readthedocs.io/en/latest/basics.html).
 
 ### Spinning Up Local Airflow Services
-1. Download this repo and cd into the main folder (cd data-engineering-batchN). Change N in batchN accordingly. For example, if you are in batch 12, N should be 12.
+1. data-engineering-batch12 리포를 다운로드받고 메인폴더로 이동한다.
 ```
 git clone https://github.com/keeyong/data-engineering-batch12.git
 cd data-engineering-batch12
 ```
-3. Run `docker-compose up`
-4. Go to a web browser and enter address `http://localhost:8080/`. You should see an Aiflow login page:
+2. Airflow 2.5.1에 해당하는 docker-compose.yaml을 다운로드받는다.
+```
+curl -LfO 'https://airflow.apache.org/docs/apache-airflow/2.5.1/docker-compose.yaml'
+```
+3. `docker compose up airflow-init`를 실행한다. 이 때 Redis와 Postgres가 실행되고 Airflow 설치가 완료된다.
+![docker compose init 결과 화면](./images/docker_compose_init.png)
+4. Airflow를 실행하기 위해 `docker compose up` 명령을 실행한다.
+![docker compose up 결과 화면](./images/docker_compose_up.png)
+5. 브라우저를 열고 `http://localhost:8080/`로 접근한다. 다음과 같은 로그인 페이지가 보여야 한다:
 ![Local Airflow Login Page](./images/airflow_login.png)
-4. Login with
+6. 아래 정보로 로그인한다
     * username: `airflow`
     * password: `airflow`
-5. If login successfully, you should get to the Airflow homepage that looks similar to the one in prod and staging
+7. 로그인하면 아래와 같은 페이지가 보여야 한다
+![Local Airflow Login Page](./images/airflow_login.png)
 
 ### Shutting Down Local Airflow Services
 1. `ctrl+c`
 ![control-c](./images/docker_ctrl_c.png)
-2. Run `docker-compose down`
+2. Run `docker compose down`
 ![docker-compose down](./images/docker_compose_down.png)
-
-### Import Airflow Local Variables from Prod
-If this is the first time you've launched Airflow on your local machine, you can import all of the variables defined in prod by following the steps below:
-1. Go to `http://<airflow-server-endpoint>/variable/list/`
-![Prod Var List](./images/var_list.png)
-2. Select the variables you want to import. We suggest that you import all by checking the top most checkbox
-![Prod Var List Selected](./images/var_list_selected.png)
-3. Select `Actions` -> `Export`
-4. Go to `http://localhost:8080/variable/list/`
-5. Go to `Choose File` and select the variable file you just downloaded
-6. Select `Import Variables`
-
-### Connections
-There's currently no simple way to import connections from prod. The good news is that we only have 3 main connections we use: `aws_s3_default`, `mysql_default` and `redshift_default`
-
-Please manually add these three connections on your local Airflow environment. You should use your own credentials so you have enough permissions to inspect any errors. As long as you make sure that the connection names are **identical to the ones in prod**.
-
-If you have access to an Airflow server commandline, you can also dump the connections into a JSON file which you can import to your Docker airflow in commandline:
-
-```
-airflow connections export connections.json
-```
-
-```
-airflow connections import connections.json
-```
-
 
 ### Volumes
 Since the `docker-compose.yaml` file takes care of mounting the `./dags` folder for us. You can start developing your code and create DAGs in the `./dag` folder the same way we used to do on the Airflow server. Anything you changes there should be reflected in the container locally running Airflow.
