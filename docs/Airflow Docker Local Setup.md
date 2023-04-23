@@ -1,17 +1,16 @@
 ## Local Development
 ### One-Time Setup
-#### Install Docker
-Follow these steps to install the necessary tools.
+#### Docker 설치
+먼저 Docker를 설치하는 방법을 알아보자
 
-1. Install [Docker Community Edition (CE)](https://docs.docker.com/engine/installation/) on your workstation. Depending on the OS, you may need to configure your Docker instance to use 4.00 GB of memory for all containers to run properly. Please refer to the Resources section if using [Docker for Windows](https://docs.docker.com/docker-for-windows/#resources>) or [Docker for Mac](https://docs.docker.com/docker-for-mac/#resources) for more information.
-2. Check if you have `docker-compose` installed buy running `docker-compose --version`
-3. If not installed, install [Docker Compose](https://docs.docker.com/compose/install/) v1.29.1 and newer on your workstation (I'm using `v2.15.1`)
+1. [Docker Community Edition (CE)](https://docs.docker.com/engine/installation/)을 본인의 컴퓨터에 설치한다. 보통 최소 4GB의 메모리를 할당해야 도커가 정상적으로 동작하기에 사양이 낮은 컴퓨터라면 도커를 사용하지 않는 것이 낫다. 윈도우를 사용 중이라면 [Docker for Windows](https://docs.docker.com/docker-for-windows/#resources>)에서 Resources 섹션을 참고하고 맥을 사용 중이라면 [Docker for Mac](https://docs.docker.com/docker-for-mac/#resources)에서 Resources 섹션을 참고하기 바란다
+2. 제대로 설치가 되었는지 확인하기 위해 `docker compose version` 명령을 실행한다. 최소 버전 1.29.1이나 그 이상의 버전이 필요하다.
 
 Older versions of ``docker-compose`` do not support all the features required by ``docker-compose.yaml`` file, so double check that your version meets the minimum version requirements.
 
 
 #### Docker Setting
-1. Allocate at least 4GB (ideally 8GB) of memory to Docker. This is very important. You can increase the memory from Settings -> Resources -> ADVANCED menu from Docker Desktop
+1. 최소 4GB (이상적으로는 8GB)의 메모리를 Docker에 할당한다. 이는 Settings -> Resources -> ADVANCED 메뉴에서 설정 가능하다
 
 #### Install `pipenv`
 The Docker image we use relies on `pipenv` to create a virtual environment with appropriate packages downloaded.
