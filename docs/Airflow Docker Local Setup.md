@@ -5,11 +5,12 @@
 
 1. [Docker Community Edition (CE)](https://docs.docker.com/engine/installation/)을 본인의 컴퓨터에 설치한다. 보통 최소 4GB의 메모리를 할당해야 도커가 정상적으로 동작하기에 사양이 낮은 컴퓨터라면 도커를 사용하지 않는 것이 낫다. 윈도우를 사용 중이라면 [Docker for Windows](https://docs.docker.com/docker-for-windows/#resources>)에서 Resources 섹션을 참고하고 맥을 사용 중이라면 [Docker for Mac](https://docs.docker.com/docker-for-mac/#resources)에서 Resources 섹션을 참고하기 바란다
 2. 제대로 설치가 되었는지 확인하기 위해 `docker compose version` 명령을 실행한다. 최소 버전 1.29.1이나 그 이상의 버전이 필요하다.
+```
+ % docker compose version
+Docker Compose version v2.15.1
+```
 
-Older versions of ``docker-compose`` do not support all the features required by ``docker-compose.yaml`` file, so double check that your version meets the minimum version requirements.
-
-
-#### Docker Setting
+#### Docker Settings
 1. 최소 4GB (이상적으로는 8GB)의 메모리를 Docker에 할당한다. 이는 Settings -> Resources -> ADVANCED 메뉴에서 설정 가능하다
 
 #### Install `pipenv`
