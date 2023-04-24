@@ -55,6 +55,7 @@ e2abda41736f   postgres:13            "docker-entrypoint.s…"   53 minutes ago 
 6. 아래 정보로 로그인한다
     * username: `airflow`
     * password: `airflow`
+
 7. 로그인하면 아래와 같은 페이지가 보여야 한다
 ![Local Airflow Login Page](./images/airflow_dags.png)
 
