@@ -50,7 +50,8 @@ def load(**context):
     table = context["params"]["table"]
 
     cur = get_Redshift_connection()
-    weather_forecast_info = context["task_instance"].xcom_pull(key="return_value", task_ids="transform")
+
+
 
     #임시 테이블 생성 -> 이때까지 저장된 원본 테이블의 데이터를 모두 임시테이블로 복사
     create_sql = f"""DROP TABLE IF EXISTS {schema}.temp_{table};
@@ -65,6 +66,13 @@ def load(**context):
         raise
 
     #임시 테이블데이터 입력 -> API에서 얻어온 모든 데이터들을 입력한다.(이때문에 임시테이블에는 중복데이터가 발생한다:날짜기준)
+    weather_forecast_info = context["task_instance"].xcom_pull(key="return_value", task_ids="transform")
+
+    ret = []
+    for i in weather_forecast_info:
+        ret.append("('{}',{},{},{})".format(i["date"], i["temp"], i["min_temp"], i["max_temp"]))
+
+
     insert_sql = f"INSERT INTO {schema}.temp_{table} VALUES " + ",".join(ret)
     logging.info(insert_sql)
     try:
@@ -102,22 +110,6 @@ def load(**context):
 
 
 
-
-
-
-
-    sql = "DELETE FROM {schema}.{table};".format(schema=schema, table=table)
-
-    for info in weather_forecast_info:
-        date, temp, min_temp, max_temp = info["date"], info["temp"], info["min_temp"], info["max_temp"]
-        sql += f"""INSERT INTO {schema}.{table} (date,temp,min_temp,max_temp) VALUES ('{date}','{temp}', '{min_temp}','{max_temp}');"""
-    logging.info(sql)
-    try:
-        cur.execute(sql)
-        cur.execute("Commit;")
-    except Exception as e:
-        cur.execute("Rollback;")
-        raise
 
 
 dag_fourth_assignment = DAG(
