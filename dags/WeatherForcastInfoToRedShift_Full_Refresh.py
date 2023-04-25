@@ -51,19 +51,22 @@ def load(**context):
 
     cur = get_Redshift_connection()
     weather_forecast_info = context["task_instance"].xcom_pull(key="return_value", task_ids="transform")
-    print(weather_forecast_info)
-    sql = "BEGIN; DELETE FROM {schema}.{table};".format(schema=schema, table=table)
+    sql = "DELETE FROM {schema}.{table};".format(schema=schema, table=table)
 
     for info in weather_forecast_info:
         date, temp, min_temp, max_temp = info["date"], info["temp"], info["min_temp"], info["max_temp"]
         sql += f"""INSERT INTO {schema}.{table} (date,temp,min_temp,max_temp) VALUES ('{date}','{temp}', '{min_temp}','{max_temp}');"""
-    sql += "END;"
     logging.info(sql)
-    cur.execute(sql)
+    try:
+        cur.execute(sql)
+        cur.execute("Commit;")
+    except Exception as e:
+        cur.execute("Rollback;")
+        raise
 
 
 dag_fourth_assignment = DAG(
-    dag_id='weather_forcast_info',
+    dag_id='weather_forcast_info_full_refresh',
     start_date=datetime(2023, 4, 6),  # 날짜가 미래인 경우 실행이 안됨
     schedule='0 2 * * *',  # 적당히 조절
     max_active_runs=1,
