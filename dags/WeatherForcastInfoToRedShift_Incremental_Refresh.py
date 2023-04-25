@@ -53,7 +53,9 @@ def load(**context):
     weather_forecast_info = context["task_instance"].xcom_pull(key="return_value", task_ids="transform")
 
     #임시 테이블 생성 -> 이때까지 저장된 원본 테이블의 데이터를 모두 임시테이블로 복사
-    create_sql = f"""DROP TABLE IF EXISTS {schema}.temp_{table};CREATE TABLE {schema}.temp_{table} (LIKE {schema}.{table} INCLUDING DEFAULTS);INSERT INTO {schema}.temp_{table} SELECT * FROM {schema}.{table};"""
+    create_sql = f"""DROP TABLE IF EXISTS {schema}.temp_{table};
+                    CREATE TABLE {schema}.temp_{table} (LIKE {schema}.{table} INCLUDING DEFAULTS);
+                    INSERT INTO {schema}.temp_{table} SELECT * FROM {schema}.{table};"""
     logging.info(create_sql)
     try:
         cur.execute(create_sql)
