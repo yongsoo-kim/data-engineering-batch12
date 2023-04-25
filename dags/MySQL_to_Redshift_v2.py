@@ -24,7 +24,7 @@ dag = DAG(
     }
 )
 
-schema = "keeyong"
+schema = "yongsookim_com"
 table = "nps"
 s3_bucket = "grepp-data-engineering"
 s3_key = schema + "-" + table       # s3_key = schema + "/" + table

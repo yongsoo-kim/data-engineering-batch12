@@ -61,7 +61,7 @@ execsql = PythonOperator(
     task_id = 'execsql',
     python_callable = execSQL,
     params = {
-        'schema' : 'keeyong',
+        'schema' : 'yongsookim_com',
         'table': 'channel_summary',
         'sql' : """SELECT
 	      DISTINCT A.userid,
