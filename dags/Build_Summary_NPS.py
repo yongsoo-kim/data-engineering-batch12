@@ -51,7 +51,7 @@ def execSQL(**context):
 
 
 dag = DAG(
-    dag_id = "Build_Summary",
+    dag_id = "Build_NPS_Summary",
     start_date = datetime(2021,12,10),
     schedule = '@once',
     catchup = False
