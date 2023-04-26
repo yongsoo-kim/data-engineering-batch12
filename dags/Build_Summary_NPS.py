@@ -63,9 +63,7 @@ execsql = PythonOperator(
     params = {
         'schema' : 'yongsookim_com',
         'table': 'nps_summary',
-        'sql' : """
-            SELECT * FROM yongsookim_com.nps WHERE TO_CHAR(created_at,'YYYY-MM-DD') = '2023-01-02' 
-        """
+        'sql' : """SELECT * FROM yongsookim_com.nps WHERE TO_CHAR(created_at,'YYYY-MM-DD') = '2023-01-02' """
     },
     dag = dag
 )
