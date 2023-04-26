@@ -32,6 +32,9 @@ def execSQL(**context):
 
     sql = f"""DROP TABLE IF EXISTS {schema}.temp_{table};CREATE TABLE {schema}.temp_{table} AS """
     sql += select_sql
+
+    logging.info(sql)
+
     cur.execute(sql)
 
     cur.execute(f"""SELECT COUNT(1) FROM {schema}.temp_{table}""")
