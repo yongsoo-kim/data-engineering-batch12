@@ -44,9 +44,9 @@ def execSQL(**context):
     # NPS값을 계산후 임시테이블에 INSERT함. 이떄 중복이 생길수 있다.
     try:
         sql = f"""
-                    WITH target_date_nps AS (SELECT * FROM yongsookim_com.nps WHERE TO_CHAR(created_at,'YYYY-MM-DD') = '2023-01-02')
+                    WITH target_date_nps AS (SELECT * FROM yongsookim_com.nps WHERE TO_CHAR(created_at,'YYYY-MM-DD') = '2023-01-02'); 
                     INSERT INTO {schema}.{table}(run_date, nps) 
-                    SELECT '2023-01-02' AS run_date, (((SELECT COUNT(DISTINCT id) from target_date_nps WHERE score BETWEEN 9 and 10) - (SELECT COUNT(DISTINCT id) from target_date_nps WHERE score BETWEEN 0 and 6))::Float / ((SELECT COUNT(DISTINCT id) from target_date_nps)) * 100) AS nps 
+                        SELECT '2023-01-02' AS run_date, (((SELECT COUNT(DISTINCT id) from target_date_nps WHERE score BETWEEN 9 and 10) - (SELECT COUNT(DISTINCT id) from target_date_nps WHERE score BETWEEN 0 and 6))::Float / ((SELECT COUNT(DISTINCT id) from target_date_nps)) * 100) AS nps 
             """
         sql += "COMMIT;"
         logging.info(sql)
