@@ -63,7 +63,7 @@ def execSQL(**context):
                     SELECT * ,ROW_NUMBER() OVER (PARTITION BY run_date ORDER BY created_at DESC) seq
                     FROM {schema}.temp_{table}
                   )
-                  WHERE seq=1
+                  WHERE seq=1;
             """
         sql += "COMMIT;"
         logging.info(sql)
