@@ -43,7 +43,7 @@ def execSQL(**context):
     try:
         sql = f"""INSERT INTO {schema}.{table}(run_date, nps) 
                     SELECT TO_CHAR('{{ execution_date }}','YYYY-MM-DD') AS run_date, (((SELECT COUNT(DISTINCT id) from {schema}.temp_{table} WHERE score BETWEEN 9 and 10) - (SELECT COUNT(DISTINCT id) from {schema}.temp_{table} WHERE score BETWEEN 0 and 6))::Float / ((SELECT COUNT(DISTINCT id) from {schema}.temp_{table})) * 100) AS nps
-                  ON CONFLICT ON CONSTRAINT (run_date) 
+                  ON CONFLICT (run_date) 
                   DO
                     UPDATE SET run_date=excluded.run_date, SET nps=excluded.nps, SET created_date=now() 
             """
