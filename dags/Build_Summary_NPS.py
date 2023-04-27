@@ -30,23 +30,17 @@ def execSQL(**context):
 
     cur = get_Redshift_connection()
 
-    # 기존의 서머리 테이블을 복사한 임시 테이블 생성
-    try:
-        sql = f"""DROP TABLE IF EXISTS {schema}.temp_{table};
-              CREATE TABLE {schema}.temp_{table} (LIKE {schema}.{table} INCLUDING DEFAULTS);INSERT INTO {schema}.temp_{table} SELECT * FROM {schema}.{table}"""
-        cur.execute(sql)
+    sql = f"""DROP TABLE IF EXISTS {schema}.temp_{table};CREATE TABLE {schema}.temp_{table} AS """
+    sql += select_sql
+    cur.execute(sql)
 
-    except Exception as e:
-        cur.execute("ROLLBACK")
-        logging.error('Failed to sql. Completed ROLLBACK!')
-        raise AirflowException("")
+    cur.execute(f"""SELECT COUNT(1) FROM {schema}.temp_{table}""")
+    count = cur.fetchone()[0]
+    if count == 0:
+        raise ValueError(f"{schema}.{table} didn't have any record")
 
-    # NPS값을 계산후 임시테이블에 INSERT함. 이떄 중복이 생길수 있다.
     try:
-        sql = f"""INSERT INTO {schema}.temp_{table}(run_date, nps) 
-                    SELECT '2023-01-02' AS run_date, (((COUNT(CASE WHEN score BETWEEN 9 AND 10 THEN 1 END) -  COUNT(CASE WHEN score BETWEEN 0 AND 6 THEN 1 END))::Float /  COUNT(id) ) * 100 ) AS nps
-                    FROM (SELECT * FROM {schema}.nps WHERE TO_CHAR(created_at,'YYYY-MM-DD')='2023-01-02') 
-            """
+        sql = f"""DROP TABLE IF EXISTS {schema}.{table};ALTER TABLE {schema}.temp_{table} RENAME to {table};"""
         sql += "COMMIT;"
         logging.info(sql)
         cur.execute(sql)
@@ -55,24 +49,49 @@ def execSQL(**context):
         logging.error('Failed to sql. Completed ROLLBACK!')
         raise AirflowException("")
 
-    # 기존 테이블을 삭제후, 임시테이블에서 중복을 뺸 결과를 써머리 테이블로 넣는다.
-    try:
-        sql = f"""DELETE FROM {schema}.{table};
-                  INSERT INTO {schema}.{table}
-                      SELECT run_date, nps
-                      FROM (
-                        SELECT * ,ROW_NUMBER() OVER (PARTITION BY run_date ORDER BY created_at DESC) seq
-                        FROM {schema}.temp_{table}
-                      )
-                      WHERE seq=1;
-            """
-        sql += "COMMIT;"
-        logging.info(sql)
-        cur.execute(sql)
-    except Exception as e:
-        cur.execute("ROLLBACK")
-        logging.error('Failed to sql. Completed ROLLBACK!')
-        raise AirflowException("")
+    # # 기존의 서머리 테이블을 복사한 임시 테이블 생성
+    # try:
+    #     sql = f"""DROP TABLE IF EXISTS {schema}.temp_{table};
+    #           CREATE TABLE {schema}.temp_{table} (LIKE {schema}.{table} INCLUDING DEFAULTS);INSERT INTO {schema}.temp_{table} SELECT * FROM {schema}.{table}"""
+    #     cur.execute(sql)
+    #
+    # except Exception as e:
+    #     cur.execute("ROLLBACK")
+    #     logging.error('Failed to sql. Completed ROLLBACK!')
+    #     raise AirflowException("")
+    #
+    # # NPS값을 계산후 임시테이블에 INSERT함. 이떄 중복이 생길수 있다.
+    # try:
+    #     sql = f"""INSERT INTO {schema}.temp_{table}(run_date, nps)
+    #                 SELECT '2023-01-02' AS run_date, (((COUNT(CASE WHEN score BETWEEN 9 AND 10 THEN 1 END) -  COUNT(CASE WHEN score BETWEEN 0 AND 6 THEN 1 END))::Float /  COUNT(id) ) * 100 ) AS nps
+    #                 FROM (SELECT * FROM {schema}.nps WHERE TO_CHAR(created_at,'YYYY-MM-DD')='2023-01-02')
+    #         """
+    #     sql += "COMMIT;"
+    #     logging.info(sql)
+    #     cur.execute(sql)
+    # except Exception as e:
+    #     cur.execute("ROLLBACK")
+    #     logging.error('Failed to sql. Completed ROLLBACK!')
+    #     raise AirflowException("")
+    #
+    # # 기존 테이블을 삭제후, 임시테이블에서 중복을 뺸 결과를 써머리 테이블로 넣는다.
+    # try:
+    #     sql = f"""DELETE FROM {schema}.{table};
+    #               INSERT INTO {schema}.{table}
+    #                   SELECT run_date, nps
+    #                   FROM (
+    #                     SELECT * ,ROW_NUMBER() OVER (PARTITION BY run_date ORDER BY created_at DESC) seq
+    #                     FROM {schema}.temp_{table}
+    #                   )
+    #                   WHERE seq=1;
+    #         """
+    #     sql += "COMMIT;"
+    #     logging.info(sql)
+    #     cur.execute(sql)
+    # except Exception as e:
+    #     cur.execute("ROLLBACK")
+    #     logging.error('Failed to sql. Completed ROLLBACK!')
+    #     raise AirflowException("")
 
 
 
@@ -89,7 +108,7 @@ execsql = PythonOperator(
     params = {
         'schema' : 'yongsookim_com',
         'table': 'nps_summary',
-        'sql' : """SELECT * FROM yongsookim_com.nps WHERE TO_CHAR(created_at,'YYYY-MM-DD') = '2023-01-02'"""
+        'sql' : """SELECT TO_CHAR(created_at,'YYYY-MM-DD') AS RUN_DATE, (((COUNT(CASE WHEN score BETWEEN 9 AND 10 THEN 1 END) -  COUNT(CASE WHEN score BETWEEN 0 AND 6 THEN 1 END))::Float /  COUNT(id) ) * 100 ) AS nps  FROM yongsookim_com.nps GROUP BY 1"""
     },
     dag = dag
 )
