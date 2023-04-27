@@ -33,8 +33,6 @@ def execSQL(**context):
     sql = f"""DROP TABLE IF EXISTS {schema}.temp_{table};CREATE TABLE {schema}.temp_{table} AS """
     sql += select_sql
 
-    logging.info(sql)
-
     cur.execute(sql)
 
     cur.execute(f"""SELECT COUNT(1) FROM {schema}.temp_{table}""")
@@ -42,20 +40,26 @@ def execSQL(**context):
     if count == 0:
         raise ValueError(f"{schema}.{table} didn't have any record")
 
-    # try:
-    #     sql = f"""DROP TABLE IF EXISTS {schema}.{table};ALTER TABLE {schema}.temp_{table} RENAME to {table};"""
-    #     sql += "COMMIT;"
-    #     logging.info(sql)
-    #     cur.execute(sql)
-    # except Exception as e:
-    #     cur.execute("ROLLBACK")
-    #     logging.error('Failed to sql. Completed ROLLBACK!')
-    #     raise AirflowException("")
+    try:
+        sql = f"""INSERT INTO {schema}.{table}(run_date, nps) 
+                    SELECT TO_CHAR('{{ execution_date }}','YYYY-MM-DD') AS run_date, (((SELECT COUNT(DISTINCT id) from {schema}.temp_{table} WHERE score BETWEEN 9 and 10) - (SELECT COUNT(DISTINCT id) from {schema}.temp_{table} WHERE score BETWEEN 0 and 6))::Float / ((SELECT COUNT(DISTINCT id) from {schema}.temp_{table})) * 100) AS nps
+                  ON CONFLICT ON CONSTRAINT (run_date) 
+                  DO
+                    UPDATE SET run_date=excluded.run_date, SET nps=excluded.nps, SET created_date=now() 
+            """
+
+        sql += "COMMIT;"
+        logging.info(sql)
+        cur.execute(sql)
+    except Exception as e:
+        cur.execute("ROLLBACK")
+        logging.error('Failed to sql. Completed ROLLBACK!')
+        raise AirflowException("")
 
 
 dag = DAG(
     dag_id = "Build_NPS_Summary",
-    start_date = datetime(2021,12,10),
+    start_date = datetime(2023,1,1),
     schedule = '@once',
     catchup = False
 )
@@ -66,7 +70,7 @@ execsql = PythonOperator(
     params = {
         'schema' : 'yongsookim_com',
         'table': 'nps_summary',
-        'sql' : """SELECT * FROM yongsookim_com.nps WHERE TO_CHAR(created_at,'YYYY-MM-DD') = '2023-01-02' """
+        'sql' : """SELECT * FROM yongsookim_com.nps WHERE TO_CHAR(created_at,'YYYY-MM-DD') = '2023-01-02'"""
     },
     dag = dag
 )
