@@ -43,10 +43,9 @@ def execSQL(**context):
 
     # NPS값을 계산후 임시테이블에 INSERT함. 이떄 중복이 생길수 있다.
     try:
-        sql = f"""
-                    WITH target_date_nps AS (SELECT * FROM yongsookim_com.nps WHERE TO_CHAR(created_at,'YYYY-MM-DD') = '2023-01-02'); 
-                    INSERT INTO {schema}.{table}(run_date, nps) 
-                        SELECT '2023-01-02' AS run_date, (((SELECT COUNT(DISTINCT id) from target_date_nps WHERE score BETWEEN 9 and 10) - (SELECT COUNT(DISTINCT id) from target_date_nps WHERE score BETWEEN 0 and 6))::Float / ((SELECT COUNT(DISTINCT id) from target_date_nps)) * 100) AS nps 
+        sql = f"""INSERT INTO {schema}.temp_{table}(run_date, nps) 
+                    SELECT '2023-01-02' AS run_date, (((COUNT(CASE WHEN score BETWEEN 9 AND 10 THEN 1 END) -  COUNT(CASE WHEN score BETWEEN 0 AND 6 THEN 1 END))::Float /  COUNT(id) ) * 100 ) AS nps
+                    FROM (SELECT * FROM {schema}.nps WHERE TO_CHAR(created_at,'YYYY-MM-DD')='2023-01-02') 
             """
         sql += "COMMIT;"
         logging.info(sql)
@@ -58,11 +57,11 @@ def execSQL(**context):
 
     # 기존 테이블을 삭제후, 임시테이블에서 중복을 뺸 결과를 써머리 테이블로 넣는다.
     try:
-        sql = f"""DROP TABLE IF EXISTS {schema}.{table};
+        sql = f"""DELETE FROM {schema}.{table};
                   INSERT INTO {schema}.{table} 
-                    SELECT run_time, nps, created_time
+                    SELECT run_time, nps
                     FROM (
-                            SELECT * ,ROW_NUMBER OVER (PARTITION BY run_time ORDER BY created_time DESC) seq
+                            SELECT * ,ROW_NUMBER OVER (PARTITION BY run_time ORDER BY created_at DESC) seq
                             FROM {schema}.temp_{table}
                       )
                     WHERE seq=1
