@@ -58,12 +58,13 @@ def execSQL(**context):
     # 기존 테이블을 삭제후, 임시테이블에서 중복을 뺸 결과를 써머리 테이블로 넣는다.
     try:
         sql = f"""DELETE FROM {schema}.{table};
-                  SELECT run_date, nps
-                  FROM (
-                    SELECT * ,ROW_NUMBER() OVER (PARTITION BY run_date ORDER BY created_at DESC) seq
-                    FROM {schema}.temp_{table}
-                  )
-                  WHERE seq=1;
+                  INSERT INTO {schema}.{table}
+                      SELECT run_date, nps
+                      FROM (
+                        SELECT * ,ROW_NUMBER() OVER (PARTITION BY run_date ORDER BY created_at DESC) seq
+                        FROM {schema}.temp_{table}
+                      )
+                      WHERE seq=1;
             """
         sql += "COMMIT;"
         logging.info(sql)
